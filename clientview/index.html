@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta description="Blog for your random thoughts">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Libre+Baskerville|Gentium+Basic|Eczar">
+    <link rel="stylesheet" href="main.css">
+
+    <title>
+      Blogging app with CRUD
+    </title>
+  </head>
+  <body>
+    <h1>Welcome to our Blog!</h1>
+    <form class="blog-form" action="index.html" method="post">
+      <input class="blog-title-input" type="text" name="blog-title" value="" placeholder="Blog Title">
+      <textarea class="blog-content-input" type="text" name="blog-content" value="" rows="20" cols="100" placeholder="Your thoughts"></textarea>
+      <input class="blog-author-input" type="text" name="blog-author" value="" placeholder="Author">
+      <button type="submit" name="button">Submit your Blog Entry</button>
+
+    </form>
+    <section class="blog-container">
+
+    </section>
+
+    <footer>Powered by Node.Js</footer>
+    <script src="//code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="client.js" charset="utf-8"></script>
+
+  </body>
+</html>

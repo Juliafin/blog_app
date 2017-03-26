@@ -1,0 +1,57 @@
+*{
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.7em;
+}
+form {
+  text-align: center;
+}
+
+input[type="text"] {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 5%;
+}
+
+input.blog-title-input {
+    font-family: Gentium Basic;
+    height: 50px;
+    width: 30%;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+textarea.blog-content-input {
+    font-family: Gentium Basic;
+    font-size: 1.6em;
+    width: 50%;
+}
+
+input.blog-author-input {
+    text-align: center;
+    width: 15%;
+    margin-top: 4%;
+    height: 2em;
+    font-family: Gentium Basic;
+}
+
+.blog-container {
+  text-align: center;
+}
+
+article.blog-entry {
+    border: #7cbef9 1px solid;
+    margin-top: 9%;
+    margin-left: 3%;
+    margin-right: 3%;
+    padding: 2%;
+}
+
+footer {
+    text-align: center;
+    margin-top: 3%;
+    font-family: Eczar;
+}
