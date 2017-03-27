@@ -1,4 +1,5 @@
 `use strict`;
+// /blog-posts endpoint
 
 const express = require('express');
 const router = express.Router();
@@ -20,9 +21,63 @@ BlogPosts.create(
   'Julia Finarovsky'
 );
 
+// invoke jsonParser on all the protocols as middleware
+router.use(jsonParser);
 
 router.get('/', (req, res) => {
   res.status(200).json(BlogPosts.get());
+});
+
+router.post('/', (req, res) => {
+  const blogFields = ['author', 'content', 'title'];
+  console.log('this is the req.body:', req.body);
+  blogFields.forEach( (blogfield) => {
+    if (!(blogfield in req.body)) {
+      const error = `The ${blogfield} field is missing from the request`;
+      console.log(error);
+      res.status(400).json({error});
+    }
+  });
+
+  res.status(200).send('The post was successful');
+  BlogPosts.create(req.body.title, req.body.content, req.body.author);
+});
+
+
+router.delete('/:id', (req, res) => {
+  const id = req.params.id;
+  BlogPosts.delete(id);
+  console.log(id);
+  res.send(`The id entered if found, ${id} will be deleted`).end();
+});
+
+router.put('/:id', (req, res) => {
+  const blogFields = ['author', 'content', 'title'];
+  blogFields.forEach( (blogfield) => {
+    // check that the appropriate fields are in the request
+    if (!(blogfield in req.body)) {
+      const error = `The ${blogfield} field is missing from the request, please try again.`;
+      return res.status(400).json({error});
+    }
+
+    // check that the ids match
+    if (req.params.id !== req.body.id) {
+      const error = `The path id ${req.params.id} and the body id ${req.body.id} do not match`;
+      return res.status(400).json({error});
+    }
+
+    const successMsg = `Updating the blog entry`;
+    const updatedPost = {
+      id: req.params.id,
+      author: req.body.author,
+      content: req.body.content,
+      title: req.body.title
+    };
+    console.log(successMsg);
+    BlogPosts.update(updatedPost);
+    res.status(200).json({successMsg, updatedPost});
+
+  });
 });
 
 module.exports = router;
