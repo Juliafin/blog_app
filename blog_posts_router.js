@@ -25,22 +25,25 @@ BlogPosts.create(
 router.use(jsonParser);
 
 router.get('/', (req, res) => {
-  res.status(200).json(BlogPosts.get());
+  return res.status(200).json(BlogPosts.get());
 });
 
 router.post('/', (req, res) => {
   const blogFields = ['author', 'content', 'title'];
-  console.log('this is the req.body:', req.body);
+  // console.log('this is the req.body:', req.body);
+  const errors = [];
   blogFields.forEach( (blogfield) => {
     if (!(blogfield in req.body)) {
-      const error = `The ${blogfield} field is missing from the request`;
-      console.log(error);
-      res.status(400).json({error});
+      errors.push(blogfield)
     }
   });
-
-  res.status(200).send('The post was successful');
-  BlogPosts.create(req.body.title, req.body.content, req.body.author);
+  const error = {missing_fields: errors};
+  if (errors.length) {
+    return res.status(400).json(error);
+  }
+  const addedBlogPost = BlogPosts.create(req.body.title, req.body.content, req.body.author);
+  // console.log("This is the added blog post before it it's sent back: ",addedBlogPost);
+  return res.status(201).json(addedBlogPost);
 });
 
 
@@ -75,7 +78,7 @@ router.put('/:id', (req, res) => {
     };
     console.log(successMsg);
     BlogPosts.update(updatedPost);
-    res.status(200).json({successMsg, updatedPost});
+    return res.status(200).json({successMsg, updatedPost});
 
   });
 });
