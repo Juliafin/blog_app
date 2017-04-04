@@ -1,2 +1,8 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: mSMakIRQ20OXA5U+GH/TlpM18kbtqbBQdx79Zp/YhPXNlSckT/a9bUXXDN5Gt6+r/hXzmcRmmj/8Rm2HjwSkOvPH+19DiGXjLZoSuW7Rvtoq/ugwqibiz0/cmbhSH3QMp6e6D3jhJjZ+3KA215WIJ1jwySB3oHBJ5pYO4zhJUGjyVM5WE1CYpTvUemFpkTC6UYTQxgwSO30i45S4WldGbpLfnZkbWc45ta7K4hfB2EzYRDnVok30QdfpzrQZUJtUIJ1A859nMy5Z9DRDJNSMw4lEIRXNX2ekyQx0SeedmubPtk8Z3jM5+0S0/CSvH9prf1QEI55EadOhvPYPEVZyJTeUBfwiDLfsoBTeTh+MUrm6XN9A7099kPhkIaIDGmUQ5O9RPbxP9OFa/RPGpjR6t/u34mQJLNnPtBOo6lQEwlLsmFJZ3r4AxbqItU0QOSao/FI9gsawWX7miX5kRU+Ez65v6mp2Qs6/XgibaDcr4lUk/TVkhk87eqk63Rgoy/WHyurbaB1sZgS0tOJxL8BxxTG+eSgpPmFKsPZOKgXAbB2C5sp3dCOQ3+H+a6gBn8lXvGgLQe4BQOqfZpMDaJZUt4gwaSLJ/dPLFdL9RIXWItV2vvu8V80KXHsft4sNguAaEke/ZuDt4mHVSGZxz8zn0ruR39fbxKvlwkvi6+CYKx0=
+  app: pure-woodland-99823
+    repo: Juliafin/blog_app
