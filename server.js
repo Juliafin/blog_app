@@ -50,7 +50,7 @@ if(require.main === module) {
   runServer()
   .catch( err => {console.error(`There was an error: ${err}`);
   });
-}
+};
 
 
 module.exports = {app, runServer, closeServer};
