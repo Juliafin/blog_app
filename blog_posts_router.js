@@ -9,7 +9,7 @@ const jsonParser = bodyParser.json();
 
 const {BlogPosts} = require('./models/blog_posts');
 
-console.log(BlogPosts.create);
+// console.log(BlogPosts.create);
 BlogPosts.create(
   'Neither awake nor Asleep',
   `After not receiving enough sleep, I spent the day trying to survive. I even found myself drifting sometimes, in that state between asleep and awake. Waking up early in the morning, I headed for my doctor's appointment early in the morning. When I got there, I waited about 15 minutes before the secretary asked me, "Do you have any appointment?". I responded with, "Yes". She then proceeds to double check my appointment in her computer system before realizing that my appointment is in fact next week. I thought I was losing my mind!`,
@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   BlogPosts.delete(id);
-  console.log(id);
+  // console.log(id);
   res.send(`The id entered if found, ${id} will be deleted`).end();
 });
 
@@ -61,7 +61,7 @@ router.put('/:id', (req, res) => {
     // check that the appropriate fields are in the request
     if (!(blogfield in req.body)) {
       errors.push(blogfield);
-      console.log(`The field ${blogfield} was missing from your request`);
+      // console.log(`The field ${blogfield} was missing from your request`);
     }
     if (!(errors)) { 
       const errorObj = {"Missing_fields": `${errors}`}
@@ -82,10 +82,11 @@ router.put('/:id', (req, res) => {
     content: req.body.content,
     title: req.body.title
   };
-  console.log(successMsg);
+  // console.log(successMsg);
   BlogPosts.update(updatedPost);
   return res.status(200).json({successMsg, updatedPost});
 
 });
 
 module.exports = router;
+
