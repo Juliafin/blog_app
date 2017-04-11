@@ -1,0 +1,7 @@
+To connect using the mongo shell:
+mongo ds157380.mlab.com:57380/blog_data -u Julie -p heartstoeveryone
+To connect using a driver via the standard MongoDB URI (what's this?):
+
+mongodb://Julie:heartstoeveryone@ds157380.mlab.com:57380/blog_data
+
+mongoimport --host ds157380.mlab.com --port 57380 --db blog_data --collection blogs -u Julie -p heartstoeveryone --drop --file c:/projects/thinkful_projects/single_projects/blog_app/seed-data.json

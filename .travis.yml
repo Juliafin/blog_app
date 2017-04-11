@@ -7,3 +7,7 @@ deploy:
   app: pure-woodland-99823
   on:
     repo: Juliafin/blog_app
+    # safelist
+branches:
+  only:
+  - master
