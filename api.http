@@ -1,0 +1,18 @@
+GET http://localhost:8080/blog-posts
+
+###
+POST http://localhost:8080/blog-posts
+Content-Type: application/json
+ 
+{
+  "title": "A new post this morning part 3",
+  "content": "Hopefully today is a better day. The sun is shining and I'm glad",
+  "author": {
+    "firstName": "Julia",
+    "lastName": "finarovsky"
+  }
+}
+
+###
+
+GET http://localhost:8080/blog-posts?author=Billy%20Smith

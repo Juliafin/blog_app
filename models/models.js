@@ -11,16 +11,17 @@ const blogSchema = mongoose.Schema( {
 
 blogSchema.virtual('authorName').get(function() {
   return `${this.author.firstName} ${this.author.lastName}`;
-})
+});
 
 blogSchema.methods.apiRender = function() {
 
   return {
+    _id: this._id,
     title: this.title,
     content: this.content,
     author: this.authorName
-  }
-}
+  };
+};
 
 const Blog = mongoose.model('Blog', blogSchema);
 

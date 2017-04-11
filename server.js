@@ -2,7 +2,6 @@
 
 const express = require('express');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
 
@@ -15,12 +14,7 @@ const app = express();
 const blog_posts_router = require('./blog_posts_router');
 
 app.use(morgan('combined'));
-app.use(express.static('clientview'));
-app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/clientview/index.html');
-});
 
 app.use('/blog-posts', blog_posts_router);
 
@@ -30,19 +24,19 @@ let server;
 
 function runServer(databaseUrl= DATABASE_URL, port=PORT) {
   return new Promise( (resolve,reject) => {
-  mongoose.connect(databaseUrl, (err) => {
-    if (err) {
-      return reject(err);
-    }
-    server = app.listen(port, () => {
-      console.log(`Your app is listening on port ${port}`);
-      resolve(server);
+    mongoose.connect(databaseUrl, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      server = app.listen(port, () => {
+        console.log(`Your app is listening on port ${port}`);
+        resolve(server);
 
-    }).on('error', err => {
-      mongoose.disconnect();
-      reject(err);
+      }).on('error', err => {
+        mongoose.disconnect();
+        reject(err);
+      });
     });
-  });
   });
 }
 
@@ -59,14 +53,14 @@ function closeServer() {
         resolve();
       });
     }); 
-  })
+  });
 }
 
 if(require.main === module) {
   runServer()
   .catch( err => {console.error(`There was an error: ${err}`);
   });
-};
+}
 
 
 module.exports = {app, runServer, closeServer};
