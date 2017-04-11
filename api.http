@@ -1,18 +1,45 @@
 GET http://localhost:8080/blog-posts
 
-###
+### put request with sample blog
 POST http://localhost:8080/blog-posts
 Content-Type: application/json
  
 {
-  "title": "A new post this morning part 3",
-  "content": "Hopefully today is a better day. The sun is shining and I'm glad",
+  "title": "Finally endpoints work!",
+  "content": "I'm so happy I think I finally got the hang of these mongodb endpoints :)",
   "author": {
     "firstName": "Julia",
-    "lastName": "finarovsky"
+    "lastName": "Finarovsky"
   }
 }
 
-###
+### get request with query
 
 GET http://localhost:8080/blog-posts?author=Billy%20Smith
+
+
+### get reqest with id
+
+GET http://localhost:8080/blog-posts/58ec4d9e1aba1c1fe81518a6
+
+
+### get request with wrong id
+
+GET http://localhost:8080/blog-posts/58c4de1aba1c1f1518a6
+
+### delete request with id
+DELETE http://localhost:8080/blog-posts/58ec67165748a752ac06a958
+
+### put request
+PUT http://localhost:8080/blog-posts/58ec6a0a1e204e439417ce77
+Content-Type: application/json
+ 
+{
+  "id" : "58ec6a0a1e204e439417ce77",
+  "content": "But making lots of progress!",
+  "title": "Not null, but something important",
+  "author": {
+    "firstName": "Julia",
+    "lastName": "Finarovsky"
+  }
+}

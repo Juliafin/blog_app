@@ -55,17 +55,27 @@ router.get('/', (req, res) => {
     });
 });
 
+router.get('/:id', (req, res) => {
+  Blog
+    .findById(req.params.id)
+    .then( blog => res.json(blog.apiRender()))
+    .catch( (err) => {
+      console.error(err);
+      res.status(500).json({message:"Internal server error: No ID match found"});
+    });
+});
+
 router.post('/', (req, res) => {
 
-  const requiredFields = ['title', 'firstName', 'lastName', 'content'];
+  const requiredFields = ['title','author', 'content'];
   const missing = [];
   requiredFields.forEach(function (field) {
     if ( 
-      (!(field in req.body)) || 
-      (!(field in req.body.author)) ) {
+      (!(field in req.body)) ) {
       missing.push(field);
     }
   });
+
   if (missing.length !== 0) {
     const missingMsg = `The ${missing.join(", ")} field(s) are missing.`;
     console.error(missingMsg);
@@ -90,27 +100,56 @@ router.post('/', (req, res) => {
     )
     .catch((err) => {
       console.error(err);
-      res.status(500).json({
-        message: "Internal Servor Error"
-      });
+      res.status(500).json({message: "Internal Servor Error"});
     });
 });
 
 
 router.put('/:id', (req,res) => {
 
-if (!(req.params.id === req.body.id)) {
-  const mismatchedId = `
-    The Request path id ${req.params.id} and the request body id ${req.body.id} do not match.`;
-  console.error(mismatchedId);
-  res.status(400).json({message:mismatchedId});
+  if (!(req.params.id === req.body.id)) {
+    const mismatchedId = `
+      The Request path id ${req.params.id} and the request body id ${req.body.id} do not match.`;
+    console.error(mismatchedId);
+    res.status(400).json({message:mismatchedId});
 
-}
+  }
 
-const fieldsToUpdate= {};
-const possibleFields= ['firstName', 'lastName', '']
+  const fieldsToUpdate= {};
+  const possibleFields= ['firstName', 'lastName', 'content', 'title'];
 
-})
+  possibleFields.forEach((field) => {
+    if ((field === 'firstName')  || (field === 'lastName') ) {
+      fieldsToUpdate[`author.${field}`] = req.body.author[field];
+    
+    } else if((field === 'content') || (field === 'title') ) {
+      fieldsToUpdate[field] = req.body[field];
+    }
+  });
+  console.log(fieldsToUpdate);
+
+  Blog
+    .findByIdAndUpdate(req.params.id, {$set: fieldsToUpdate})
+    .then( (blog) => {return res.status(201).json({updated: blog}); } )
+    .catch( (err) => {
+      console.error(err);
+      res.status(500).json({message: `Internal server error, couldn't update the item`});
+    });
+
+});
+
+router.delete('/:id', (req, res) => {
+  Blog
+    .findByIdAndRemove(req.params.id)
+    .then( (blog) => {
+      return res.status(200).json({item_deleted: blog});
+    })
+    .catch( (err) => {
+      console.error(err);
+      res.status(500).json({message: "Internal server error, item not found."});
+    });
+});
+
 
 
 
