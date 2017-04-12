@@ -1,177 +1,245 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-
+const mongoose = require('mongoose');
+const errorconsole = require('debug')('Error');
+const dataconsole = require('debug')('Data'); 
 const {app, runServer, closeServer} = require('../server');
-
+const faker = require('faker');
 const should = chai.should();
+const {TEST_DATABASE_URL} = require('../config');
+const {Blog} = require('../models/models');
 
 chai.use(chaiHttp);
+mongoose.Promise = global.Promise;
 
+function generateFakeBlogs(numberOfBlogs) {
+  const seedData = [];
+  let fakeBlog;
+  for (let i = 0; i < numberOfBlogs; i++) {
+    fakeBlog = {
+      title: faker.lorem.sentence(),
+      content: faker.lorem.paragraphs(),
+      author: {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName()
+      }
+    // seed data pushed into array
+    };
+
+  }
+    if (numberOfBlogs === 1) {
+      return fakeBlog;
+    } else {
+
+      seedData.push(fakeBlog);
+    }
+  // dataconsole("%O", seedData);
+  return seedData;
+
+}
+
+function seedBlogDb(blogArr) {
+    // returns a promise
+  return Blog.insertMany(blogArr);
+}
+
+
+function dismantleDB() {
+  console.warn('Deleting database');
+  return mongoose.connection.dropDatabase();
+}
 
 // begin tests
 
-describe('Blogging App', function () { 
+describe('Blogging App endpoints', function () {
 
 
-before(function () { 
-  return runServer();
- });
+  before(function () {
+    return runServer(TEST_DATABASE_URL);
+  });
+
+  beforeEach(function () {
+    return seedBlogDb(generateFakeBlogs(19));
+  });
+
+  afterEach(function () {
+    return dismantleDB();
+  });
+
+  after(function () {
+    return closeServer();
+  });
 
 
-after(function () {
-  return closeServer();
-});
+  describe('GET endpoint:', function () {
 
- 
+    it('should return all existing blogs', function () {
+
+      let res;
+
+      return chai.request(app)
+
+      .get('/blog-posts')
+      .then(function(_res) {
+
+        res = _res;
+        // debug(_res.body);
+
+        res.should.have.status(200);
+        res.body.blogs.should.have.length.of.at.least(1);
+        
+        return Blog.count();
+      })
+      .then(function (count) {
+        res.body.blogs.should.have.length.of(count);
+      })
+      .catch( (err) => errorconsole(err));
       
-  const blogFields = ['author', 'content', 'title', 'id'];
-  
-  it('Should get a list of blog posts on a GET request', function () { 
+    });
+
+  });
+
+
+  it('Should return blogs with the right fields', function() {
+
+    let resBlog;
     return chai.request(app)
     .get('/blog-posts')
-    .then(function (res) { 
+    .then(function(res){
       res.should.have.status(200);
       res.should.be.json;
-      res.body.should.be.a('array');
-      res.body.length.should.be.at.least(1);
-
-
-      res.body.forEach(function(field) {
-
-        field.should.be.a('object');
-        field.should.include.keys(blogFields) 
-      });
-    });
-  }); // close normal GET request tests
-
-  it("Should accept a blog post with the required fields on a POST request", function () { 
-
-    const sampleBlogPost = {
-      "author": "Julia Finarovsky",
-      "title": "Unwanted phone calls",
-      "content": `So I just received another spam phone call as I was working on this project. And I told the representative Richard that I will be reporting his company to the do not call registry. It's ridiculous that we can get interupted in the morning and that companies break the law like this. It's absolutely unacceptable`
-    };
-    return chai.request(app)
-    .post('/blog-posts')
-    .send(sampleBlogPost)
-    .then(function (res) { 
-      // console.log('This is the response from the server for Post:', res.body)
-      res.should.have.status(201);
-      res.body.should.be.a('object');
-      res.body.should.not.be.empty;
-      res.body.should.have.all.keys('content', 'author', 'title', 'id', 'publishDate');
-      res.body.id.should.not.be.null;
+      res.body.blogs.should.have.length.of.at.least(1);
       
+      res.body.blogs.forEach(function(blog) {
+        blog.should.be.a('object');
+        blog.should.include.keys(
+          'id', 'title', 'content', 'author');
+
+      });
+      // dataconsole(res.body);
+
+      resBlog = res.body.blogs[0];
+      return Blog.findById(resBlog.id);
     })
+    .then(function(blog){
+      // console.log(typeof(resBlog._id))
+      // console.log(typeof(blog._id))
 
-  }) // ends regular POST test
-
-
-  it("Should return an error message with the appropriate error if there is a field missing in the POST object", function () { 
-    const missingFieldBlogPost = {
-      "author": "Julia Finarovsky",
-      "content": `I'm enjoying coding so much that I intentionally forgot to leave out the title.`
-    };
-
-    return chai.request(app)
-    .post('/blog-posts')
-    .send(missingFieldBlogPost)
-    .catch(function (err) { 
-      // console.log(err.response.body);
-      err.should.have.status(400);
-      err.should.be.a('Error');
-      err.response.body.should.not.be.empty;
-      err.response.body.should.be.a('object');
-      err.response.body.should.include.keys('missing_fields');
-    });
-
-  }); //ends field missing on post test "dtest"
-
-  it('Should update blog posts on PUT requests', function () {  
-
-    const blogPost = {
-      "author": "Julia Finarovsky",
-      "title": "New tropical theme for vscode",
-      "content": `I am someone that really likes clarity and readability. And intersecting with my interest in tweeking my development environment, I decided to make a theme that would be more colorful and have a high contrast. I figured out that I needed to create a Microsoft account and install the publisher module via npm to do it. Finally, the theme is up on the extension marketplace,and I look forward to feedback!"`
-    };
-
-    return chai.request(app)
-    .get('/blog-posts')
-    .then(function (res) { 
-      blogPost.id = res.body[res.body.length-1].id;
+      resBlog.id.should.equal(blog.id);
+      resBlog.content.should.equal(blog.content);
+      resBlog.title.should.equal(blog.title);
+      // dataconsole(resBlog);
+      // dataconsole(blog)
+      resBlog.author.should.contain(blog.author.firstName);
+      resBlog.author.should.contain(blog.author.lastName);
       
-      return chai.request(app)
-      .put(`/blog-posts/${blogPost.id}`)
-      .send(blogPost)
-      .then(function (res) { 
-        res.should.have.status(200);
-        console.log(res.body)
-        res.body.should.be.a('object');
-        res.body.updatedPost.should.be.a('object');
-        res.body.should.have.keys('updatedPost', 'successMsg');
-        res.body.updatedPost.should.include.keys('author', 'title', 'content', 'id');
-        res.body.updatedPost.id.should.not.be.null;
-        console.log(res.body.updatedPost.id)
-        res.body.updatedPost.should.deep.equal(Object.assign(blogPost,
-        {id:res.body.updatedPost.id} ));
-      });
-
     });
+  });
 
+
+  describe('POST endpoint:', function () {
+
+    it('should add a new blog on posting', function () {
+      
+      const fakeBlog = generateFakeBlogs(1);
+      // dataconsole(fakeBlog);
+      return chai.request(app)
+        .post('/blog-posts')
+        .send(fakeBlog)
+        .then(function (res) {
+          
+          // tests the post response
+          // dataconsole(res.body);
+          res.should.have.status(201);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          res.body.should.include.keys(
+            'id', 'content', 'title', 'author');
+          
+          res.body.should.not.be.null;
+          res.body.content.should.equal(fakeBlog.content);
+          res.body.title.should.equal(fakeBlog.title);
+
+          return Blog.findById(res.body.id);
+        })
+        // test the database that it actually contains the posted object
+        .then(function (blog) { 
+          dataconsole(blog);
+          blog.title.should.equal(fakeBlog.title);
+          blog.content.should.equal(fakeBlog.content);
+          blog.author.firstName.should.equal(fakeBlog.author.firstName);
+          blog.author.lastName.should.equal(fakeBlog.author.lastName);
+        })
+      .catch((err) => {errorconsole(err)});
+                
+    });
+  });
+
+
+  describe('PUT endpoint:', function () {
+
+    it('Should update blog fields sent via PUT', function () {
     
+      const updatedBlog = {
+        author: {
+          firstName: "Julia",
+          lastName: "Finarovsky"
+        },
+        title: "It's really really late but I have to finish this."
+      };
 
-  }); //ends main PUT request test
+      return Blog
+      .findOne()
+      .then(function (blog) {
+        updatedBlog.id = blog.id;
 
-  it("Should return an error if the ids do not match for the put request ", function () {
-
-    const missingFieldsblogPost = {
-      "author": "Julia Finarovsky",
-      "title": "Staying up late",
-      "content": `So I enjoy staying up late. It's been a life long obsession of mine. To feel like I am in control of my own freedom. And feeling like I am my own person. Although waking up early sucks.`      
-    };
-
-    return chai.request(app)
-    .get('/blog-posts')
-    .then(function (res) { 
-      const wrongID = res.body[res.body.length-1].id;
-      missingFieldsblogPost.id = res.body[0].id;
-      return chai.request(app)
-      .put(`/blog-posts/${wrongID}`)
-      .send(missingFieldsblogPost)
-      .catch(function (err) { 
-        err.should.be.a('error');
-        err.should.have.status(400);
-        err.response.text.should.be.a('string');
-        err.response.text.should.contain(wrongID, missingFieldsblogPost.id);
-      });
-
-    });
-
-  }); // ends fields not matching
-
-
-  it("Should delete the appropriate item on a DELETE request", function () {   
-
-    return chai.request(app)
-    .get('/blog-posts')
-    .then(function (res) {
-      console.log(res.body); 
-
-      const idToDelete = res.body[0].id;
-
-      return chai.request(app)
-      .delete(`/blog-posts/${idToDelete}`)
-      .then(function (res) {  
-        res.should.have.status(200);
-        res.text.should.be.a('string');
-        res.text.should.contain(idToDelete);
-        console.log(res.text);
+        return chai.request(app)
+        .put(`/blog-posts/${updatedBlog.id}`)
+        .send(updatedBlog);
       })
+      .then(function (res) {
+        res.should.have.status(201);
 
-    })  
-  })
-  
-  
+        return Blog.findById(updatedBlog.id);
+      })
+      .then(function(blog){
+        // dataconsole(blog);
+        blog.title.should.equal(updatedBlog.title);
+        blog.author.firstName.should.equal(updatedBlog.author.firstName);
+        blog.author.lastName.should.equal(updatedBlog.author.lastName);
+      })
+      .catch((err) => {errorconsole(err)});
+    });
+  });
 
 
+  describe('DELETE endpoint:', function () {
+
+    it('Should delete a restaurant by ID', function () {
+
+      let deletedBlog;
+
+      return Blog
+
+        .findOne()
+        .then(function(_blog){
+          deletedBlog = _blog;
+          return chai.request(app)
+          .delete(`/blog-posts/${_blog.id}`);
+        })
+        .then(function (res) {
+          res.should.have.status(200);
+          // dataconsole(res);
+          res.body.item_deleted._id.should.equal(deletedBlog.id);
+
+          return Blog.findById(deletedBlog.id);
+        })
+        .then(function (_blog) {
+          should.not.exist(_blog);
+        })
+      .catch((err) => {errorconsole(err)});
+        
+    });
+  });
 }); // close server tests
+

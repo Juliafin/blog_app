@@ -3,15 +3,14 @@
 
 const express = require('express');
 const router = express.Router();
+// const debug = require('debug')('server');
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const {
-  Blog
-} = require('./models/models');
+const {Blog} = require('./models/models');
 
 router.use(bodyParser.json());
 
@@ -39,7 +38,7 @@ router.get('/', (req, res) => {
 
     .find(userFilters)
     .then(blogs => {
-      console.log(blogs);
+      // debug(blogs);
 
       return res.json({
         blogs: blogs.map((blog) => blog.apiRender())
@@ -119,10 +118,16 @@ router.put('/:id', (req,res) => {
   const possibleFields= ['firstName', 'lastName', 'content', 'title'];
 
   possibleFields.forEach((field) => {
-    if ((field === 'firstName')  || (field === 'lastName') ) {
+    if (
+      (field === 'firstName' && (field in req.body.author)) || 
+      (field === 'lastName' && (field in req.body.author)) 
+      ) {
       fieldsToUpdate[`author.${field}`] = req.body.author[field];
     
-    } else if((field === 'content') || (field === 'title') ) {
+    } else if(
+    (field === 'content' && (field in req.body)) || 
+    (field === 'title' && field in req.body) 
+    ) {
       fieldsToUpdate[field] = req.body[field];
     }
   });
