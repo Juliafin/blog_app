@@ -31,15 +31,12 @@ GET http://localhost:8080/blog-posts/58c4de1aba1c1f1518a6
 DELETE http://localhost:8080/blog-posts/58ec67165748a752ac06a958
 
 ### put request
-PUT http://localhost:8080/blog-posts/58ec6a0a1e204e439417ce77
+PUT http://localhost:8080/blog-posts/58ed911c5a101e13bc3184c2
 Content-Type: application/json
  
 {
-  "id" : "58ec6a0a1e204e439417ce77",
-  "content": "But making lots of progress!",
-  "title": "Not null, but something important",
-  "author": {
-    "firstName": "Julia",
-    "lastName": "Finarovsky"
-  }
+  "id" : "58ed911c5a101e13bc3184c2",
+  "title": "Try not null",
+  "content": "How about some actual content"
+  
 }
