@@ -3,6 +3,7 @@
 
 const express = require('express');
 const router = express.Router();
+// const debug = require('debug')('server');
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -39,7 +40,7 @@ router.get('/', (req, res) => {
 
     .find(userFilters)
     .then(blogs => {
-      console.log(blogs);
+      // debug(blogs);
 
       return res.json({
         blogs: blogs.map((blog) => blog.apiRender())
