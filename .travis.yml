@@ -1,5 +1,7 @@
 language: node_js
 node_js: node
+services:
+  -mongoDb
 deploy:
   provider: heroku
   api_key:
@@ -7,7 +9,3 @@ deploy:
   app: pure-woodland-99823
   on:
     repo: Juliafin/blog_app
-    # safelist
-branches:
-  only:
-  - master
