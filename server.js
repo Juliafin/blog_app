@@ -16,6 +16,9 @@ app.use(morgan('combined'));
 
 
 app.use('/blog-posts', blog_posts_router);
+app.use('*', (req, res) => {
+  res.status(404).send('Nothing found at this endpoint. Please do not try again.')
+})
 
 
 // add server functions to export for tests
